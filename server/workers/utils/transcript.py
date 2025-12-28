@@ -6,11 +6,11 @@ class Transcript:
     def fetch_transcript(self,video_id:str):
         try:
             fetched_transcript = self.ytt_api.fetch(video_id)
-            return self.chunk_transcript(fetched_transcript,video_id)
+            return self.chunk_transcript(fetched_transcript)
         except Exception as e:
             raise e
     
-    def chunk_transcript(self,transcript,video_id):
+    def chunk_transcript(self,transcript):
         current_chunk = ""
         current_start = 0.0
         grouped_chunks = []
@@ -28,7 +28,6 @@ class Transcript:
                 grouped_chunks.append({
                     "text":current_chunk.strip(),
                     "start":current_start,
-                    "video_id":video_id
                 })
                 current_chunk = ""
         
@@ -36,7 +35,6 @@ class Transcript:
             grouped_chunks.append({
                 "text": current_chunk.strip(),
                 "start": current_start,
-                "video_id": video_id
             })
         
         return grouped_chunks

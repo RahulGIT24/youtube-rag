@@ -14,6 +14,12 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    QDRANT_HOST:str
+    QDRANT_PORT:int
+    QDRANT_COLLECTION:str
+
+    DENSE_EMBEDDING_MODEL:str
+
     model_config = SettingsConfigDict(
         env_file='.env',
         case_sensitive=True

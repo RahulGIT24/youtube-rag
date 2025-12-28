@@ -5,13 +5,16 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 from core.config import settings
 from core.async_redis import redis_client
+from core.qdrant import create_collection
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
     await FastAPILimiter.init(redis_client)
+    create_collection()
     yield
     await FastAPILimiter.close()
+
 
 app = FastAPI(lifespan=lifespan)
 
