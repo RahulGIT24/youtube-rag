@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     QDRANT_HOST:str
     QDRANT_PORT:int
     QDRANT_COLLECTION:str
+    SPARSE_EMBEDDING_MODEL:str
 
     DENSE_EMBEDDING_MODEL:str
 

@@ -1,4 +1,4 @@
-from qdrant_client import QdrantClient,models
+from qdrant_client import QdrantClient
 
 from dotenv import load_dotenv
 import os

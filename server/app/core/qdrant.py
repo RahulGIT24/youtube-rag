@@ -7,13 +7,17 @@ def create_collection():
     is_exist = client.collection_exists(name)
 
     if is_exist == False:
-        client.create_collection(collection_name=name,vectors_config=models.VectorParams(
-            size=client.get_embedding_size(settings.DENSE_EMBEDDING_MODEL),
-            distance=models.Distance.COSINE
-        ),
-        sparse_vectors_config={
-            "text":models.SparseVectorParams()
-        })
+        client.create_collection(collection_name=name,
+            vectors_config={
+                "dense-text":models.VectorParams(
+                    size=client.get_embedding_size(settings.DENSE_EMBEDDING_MODEL),
+                    distance=models.Distance.COSINE
+                )
+            },
+            sparse_vectors_config={
+                "sparse-text":models.SparseVectorParams()
+            }
+        )
 
     client.close()
 
