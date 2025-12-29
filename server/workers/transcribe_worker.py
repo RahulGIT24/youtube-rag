@@ -78,7 +78,7 @@ def process_job(job:dict):
         raise e
 
 def start_worker():
-    logging.info("Worker Started")
+    print("Worker Started")
     logging.info("Waiting For Jobs......")
 
     while True:

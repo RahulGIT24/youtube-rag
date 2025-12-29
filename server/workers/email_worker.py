@@ -33,10 +33,8 @@ def send_email(subject: str, body: str, to_email: str):
             smtp.send_message(msg)
         
         logging.info("Email Sent to "+to_email)
-        return True
     except Exception as e:
-      print('An exception occurred',e)
-      return False
+        raise e
 
 def process_job(job:dict):
     try:
@@ -52,10 +50,10 @@ def process_job(job:dict):
             body=signup_template(base_url=os.getenv('CLIENT_BASE_URL'),name=name,token=token)
             send_email("Thanks for Signing Up",body,email)
     except Exception as e:
-        print(e)
+        raise e
 
 def start_worker():
-    logging.info("Worker Started")
+    print("Worker Started")
     logging.info("Waiting For Jobs......")
 
     while True:
