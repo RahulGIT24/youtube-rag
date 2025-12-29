@@ -8,6 +8,7 @@ from app.core.redis import redis_client
 import json
 import jwt
 from app.core.config import settings
+from app.models import User
 
 EMAIL_QUEUE="queue:email"
 
@@ -18,8 +19,8 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-def generate_verification_token(user_id:int,expire_minutes: int = 30):
-    to_encode = {"sub": user_id} 
+def generate_verification_token(user_id:str,expire_minutes: int = 30):
+    to_encode = {"sub": str(user_id)} 
     expire = datetime.now(tz=timezone.utc) + timedelta(minutes=expire_minutes)
     to_encode.update({"exp": expire, "iat": datetime.now(tz=timezone.utc)})
     
@@ -44,13 +45,14 @@ def create_user(email: str, name: str, password: str, db: Session):
                         status_code=200
                     )
 
+            token=generate_verification_token(user_id=existing_user.id)
             existing_user.name = name
             existing_user.password = get_password_hash(password)
             existing_user.verification_token_sent_at = now
+            existing_user.verification_token=token
 
             db.commit()
             db.refresh(existing_user)
-            token=generate_verification_token(user_id=existing_user.id)
             details = {
                 "name": name,
                 "email": email,
@@ -75,8 +77,13 @@ def create_user(email: str, name: str, password: str, db: Session):
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
+
         token=generate_verification_token(user_id=new_user.id)
 
+        new_user.verification_token = token
+
+        db.commit()
+        db.refresh(new_user)
         details = {
             "name": name,
             "email": email,
@@ -96,3 +103,22 @@ def create_user(email: str, name: str, password: str, db: Session):
         print(e)
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
+def verify_token(token:str,db:Session):
+    try:
+        decoded_payload = jwt.decode(token,settings.VERIFICATION_SECRET_KEY,'HS256')
+        user_id=decoded_payload['sub']
+
+        user = db.query(User).filter(User.id==int(user_id)).first()
+
+        user.is_verified = True
+        user.verification_token = None
+        user.verification_token_sent_at = None
+
+        db.commit()
+        db.refresh(user)
+
+        return JSONResponse(content={"message":"User Verified. You can login now."},status_code=200)
+    except jwt.ExpiredSignatureError as e:
+        raise HTTPException(detail="Token Expired",status_code=403)
+    except jwt.InvalidTokenError as e:
+        raise HTTPException(detail="Invalid Token",status_code=403)

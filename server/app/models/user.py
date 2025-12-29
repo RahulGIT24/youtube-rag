@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column,relationship
-from sqlalchemy import String,Boolean,DateTime
+from sqlalchemy import String,Boolean,DateTime,Text
 from datetime import datetime
 from typing import List,TYPE_CHECKING
 from app.core.database import Base
@@ -15,10 +15,10 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(100))
     is_verified:Mapped[bool] = mapped_column(Boolean,default=False)
-    verification_token:Mapped[str]= mapped_column(String(100),nullable=True)
+    verification_token:Mapped[str]= mapped_column(Text,nullable=True)
     verification_token_sent_at:Mapped[datetime | None]=mapped_column(DateTime(timezone=True),nullable=True,default=None)
-    forgot_password_token:Mapped[str]= mapped_column(String(100),nullable=True)
-    refresh_token:Mapped[str]= mapped_column(String(100),nullable=True)
+    forgot_password_token:Mapped[str]= mapped_column(Text,nullable=True)
+    refresh_token:Mapped[str]= mapped_column(Text,nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     # Relations
