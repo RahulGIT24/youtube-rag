@@ -15,9 +15,10 @@ class Settings(BaseSettings):
     REDIS_HOST:str
     REDIS_PORT:int
 
-    JWT_SECRET:str
-    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_SECRET:str
+    REFRESH_TOKEN_SECRET:str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 24 * 60 * 10
 
     QDRANT_HOST:str
     QDRANT_PORT:int
