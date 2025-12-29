@@ -79,16 +79,16 @@ def process_job(job:dict):
 
 def start_worker():
     logging.info("Worker Started")
+    logging.info("Waiting For Jobs......")
 
     while True:
-        logging.info("Waiting For Jobs......")
         try:
             _,data=redis_client.blpop(QUEUE_NAME)
             job = json.loads(data)
             process_job(job)
 
         except Exception as e:
-            logging.error('Error while processing jobs. ',e)
+            logging.exception('Error while processing jobs. '+e)
 
 if __name__ == "__main__":
     start_worker()

@@ -1,4 +1,4 @@
-from core.redis import redis_client
+from app.core.redis import redis_client
 import json
 
 def generate_transcribe_and_push_to_redis(user_id,video_id,video_url):

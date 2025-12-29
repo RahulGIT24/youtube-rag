@@ -1,8 +1,8 @@
 from fastapi import APIRouter,HTTPException
 from fastapi.responses import JSONResponse
-from schemas.transcribe import TranscribeBody
-from utils.urls import extract_youtube_video_id
-from services.v1.transcribe import generate_transcribe_and_push_to_redis
+from app.schemas.transcribe import TranscribeBody
+from app.utils.urls import extract_youtube_video_id
+from app.services.v1.transcribe import generate_transcribe_and_push_to_redis
 
 router = APIRouter()
 

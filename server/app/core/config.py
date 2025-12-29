@@ -6,6 +6,11 @@ class Settings(BaseSettings):
     DEBUG:bool=True
 
     API_V1_PREFIX:str="/api/v1"
+    DATABASE_URL:str
+    VERIFICATION_SECRET_KEY:str
+    CLIENT_BASE_URL:str
+    EMAIL_ADDRESS:str
+    EMAIL_PASSWORD:str
 
     REDIS_HOST:str
     REDIS_PORT:int
@@ -23,7 +28,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file='.env',
-        case_sensitive=True
+        case_sensitive=True,
     )
 
 settings = Settings()

@@ -1,5 +1,5 @@
 from qdrant_client import QdrantClient,models
-from core.config import settings
+from .config import settings
 
 def create_collection():
     client = QdrantClient(host=settings.QDRANT_HOST,port=settings.QDRANT_PORT)

@@ -1,11 +1,10 @@
 from fastapi import FastAPI,Depends
-import uvicorn
-from api.router import api_router
+from app.api.router import api_router
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
-from core.config import settings
-from core.async_redis import redis_client
-from core.qdrant import create_collection
+from app.core.config import settings
+from app.core.async_redis import redis_client
+from app.core.qdrant import create_collection
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
@@ -23,6 +22,3 @@ def health_check():
     return {"message":"Server is healthy"}
 
 app.include_router(api_router,prefix=settings.API_V1_PREFIX,dependencies=[Depends(RateLimiter(times=2,seconds=5))])
-
-if __name__ == "__main__":
-    uvicorn.run(host='127.0.0.1',port=8001,app='main:app',reload=True)

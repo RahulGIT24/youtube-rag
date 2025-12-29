@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from api.v1 import transcribe,auth
+from app.api.v1 import transcribe,auth
 
 api_router = APIRouter()
 
