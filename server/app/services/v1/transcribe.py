@@ -11,7 +11,10 @@ from core.embedding_models import dense_embedding,sparse_embedding
 from core.qdrant import get_client
 from core.config import settings
 from qdrant_client import models
+from app.utils.llm import LLM
+import json
 
+llm = LLM()
 QUEUE_NAME = "queue:pending"
 qdrant_client=get_client()
 COLLECTION_NAME=settings.QDRANT_COLLECTION
@@ -121,14 +124,14 @@ def generate_response(session_id:int,query:str,db:Session,user_id:int):
                 models.Prefetch(
                     query=models.SparseVector(indices=sparse_embeddings[0].indices, values=sparse_embeddings[0].values),
                     using="sparse-text",
-                    limit=20,
-                    score_threshold=0.7,
+                    limit=15,
+                    score_threshold=0.5,
                 ),
                 models.Prefetch(
                     query=embeddings, 
                     using="dense-text",
-                    limit=20,
-                    score_threshold=0.6,
+                    limit=15,
+                    score_threshold=0.5,
                 ),
             ],
             query_filter=models.Filter(
@@ -139,16 +142,24 @@ def generate_response(session_id:int,query:str,db:Session,user_id:int):
                     )
                 ]
             ),
-            score_threshold=0.6,
             query=models.FusionQuery(fusion=models.Fusion.RRF),
             limit=10
         )
 
-        print(res)
+        context=[]
 
-        return JSONResponse(content={"message":"Queried Successfully"},status_code=200)
+        for point in res.points:
+            payload=point.payload
+            context.append({
+                'start':payload['start'],
+                'text':payload['text'],
+                'score':point.score
+            })
+        
+        res = llm.call_llm(context=json.dumps(context),query=query)
+        raw_content = res.choices[0].message.content
+        return JSONResponse(content={"message":"Query Successfully","data":json.loads(raw_content)},status_code=200)
     except HTTPException:
         raise
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500,detail="Internal Server Error")

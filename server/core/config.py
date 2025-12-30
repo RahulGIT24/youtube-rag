@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     CLIENT_BASE_URL:str
     EMAIL_ADDRESS:str
     EMAIL_PASSWORD:str
+    LLM_API_KEY:str
+    LLM_MODEL_NAME:str
 
     REDIS_HOST:str
     REDIS_PORT:int
