@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 import json
-
-from app.models.video import Video
-from app.models.user_to_videos import UserToVideos
-from app.core.redis import redis_client
+from datetime import datetime
+from models.video import Video
+from models.user_to_videos import UserToVideos
+from core.redis import redis_client
 
 QUEUE_NAME = "queue:pending"
 
@@ -48,7 +48,8 @@ def generate_transcribe_and_push_to_redis(
             video = Video(
                 video_id=video_id,
                 video_url=video_url,
-                enqueued=True
+                enqueued=True,
+                enqueued_at=datetime.utcnow()
             )
             db.add(video)
             db.commit()
@@ -63,6 +64,7 @@ def generate_transcribe_and_push_to_redis(
 
         elif not video.enqueued:
             video.enqueued = True
+            video.enqueued_at=datetime.utcnow()
             db.commit()
 
             redis_client.lpush(

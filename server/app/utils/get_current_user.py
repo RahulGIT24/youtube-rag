@@ -2,9 +2,9 @@ from typing import Optional
 from fastapi import Request, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 import jwt
-from app.core.database import get_session
-from app.core.config import settings
-from app.models.user import User
+from core.database import get_session
+from core.config import settings
+from models.user import User
 
 def get_current_user(request: Request, db: Session = Depends(get_session)):
     """

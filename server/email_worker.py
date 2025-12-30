@@ -1,11 +1,11 @@
 import json
-from utils.redis_instance import redis_client
+from core.redis import redis_client
 from dotenv import load_dotenv
 import logging
 import os
 from email.message import EmailMessage
 import smtplib
-from utils.email_templates import signup_template
+from workers.utils.email_templates import signup_template
 
 logging.basicConfig(filename="email_worker.log",
                     format='%(asctime)s %(message)s',

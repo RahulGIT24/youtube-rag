@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from app.models.user import User
+from models.user import User
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from datetime import datetime,timedelta,timezone
-from app.core.redis import redis_client
+from core.redis import redis_client
 import json
 import jwt
-from app.core.config import settings
-from app.models import User
+from core.config import settings
+from models import User
 
 EMAIL_QUEUE="queue:email"
 EMAIL_AGAIN_MINUTES = 15

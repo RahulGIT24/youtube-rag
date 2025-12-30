@@ -2,9 +2,9 @@ from fastapi import FastAPI,Depends
 from app.api.router import api_router
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
-from app.core.config import settings
-from app.core.async_redis import redis_client
-from app.core.qdrant import create_collection
+from core.config import settings
+from core.async_redis import redis_client
+from core.qdrant import create_collection
 from contextlib import asynccontextmanager
 
 @asynccontextmanager

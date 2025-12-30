@@ -1,5 +1,5 @@
 from fastapi import APIRouter,HTTPException,Depends
-from app.core.database import get_session
+from core.database import get_session
 from app.schemas.transcribe import TranscribeBody
 from app.utils.urls import extract_youtube_video_id
 from app.services.v1.transcribe import generate_transcribe_and_push_to_redis

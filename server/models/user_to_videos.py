@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey,String
-from app.core.database import Base
+from core.database import Base
 from datetime import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.models.user import User
-    from app.models.video import Video
+    from models.user import User
+    from models.video import Video
 
 class UserToVideos(Base):
     __tablename__ = "user_to_videos_session"

@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends
 from app.schemas.user import UserSignup,UserLogin
 from sqlalchemy.orm import Session
 from app.services.v1.auth_services import create_user,verify_token,login,logout
-from app.core.database import get_session
+from core.database import get_session
 from app.utils.get_current_user import get_current_user
 
 router = APIRouter()

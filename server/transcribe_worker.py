@@ -1,7 +1,7 @@
 import json
-from workers.utils.redis_instance import redis_client
+from core.redis import redis_client
 from workers.utils.transcript import Transcript
-from workers.utils.qdrant import get_client
+from core.qdrant import get_client
 from workers.utils.embedding_models import dense_embedding,sparse_embedding
 from dotenv import load_dotenv
 import os
@@ -9,8 +9,8 @@ import uuid
 from sqlalchemy.orm import Session
 import logging
 from qdrant_client import models
-from app.models.video import Video
-from app.core.database import get_session
+from models.video import Video
+from core.database import get_session
 
 logging.basicConfig(filename="transcribe_worker.log",
                     format='%(asctime)s %(message)s',
