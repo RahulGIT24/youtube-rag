@@ -2,7 +2,7 @@ import json
 from core.redis import redis_client
 from workers.utils.transcript import Transcript
 from core.qdrant import get_client
-from workers.utils.embedding_models import dense_embedding,sparse_embedding
+from core.embedding_models import dense_embedding,sparse_embedding
 from dotenv import load_dotenv
 import os
 import uuid

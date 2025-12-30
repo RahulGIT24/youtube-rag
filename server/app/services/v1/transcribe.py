@@ -7,8 +7,14 @@ from datetime import datetime
 from models.video import Video
 from models.user_to_videos import UserToVideos
 from core.redis import redis_client
+from core.embedding_models import dense_embedding,sparse_embedding
+from core.qdrant import get_client
+from core.config import settings
+from qdrant_client import models
 
 QUEUE_NAME = "queue:pending"
+qdrant_client=get_client()
+COLLECTION_NAME=settings.QDRANT_COLLECTION
 
 def generate_transcribe_and_push_to_redis(
     user_id: int,
@@ -96,3 +102,53 @@ def generate_transcribe_and_push_to_redis(
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Internal server error")
+
+def generate_response(session_id:int,query:str,db:Session,user_id:int):
+    try:
+        exising_session=db.query(UserToVideos).filter(UserToVideos.id==session_id,UserToVideos.user_id==user_id).first()
+        
+        if not exising_session:
+            raise HTTPException(status_code=404,detail="Session Not found")
+
+        video_id = exising_session.video_id
+
+        embeddings = list(dense_embedding.embed([query]))[0]
+        sparse_embeddings = list(sparse_embedding.embed([query]))
+
+        res = qdrant_client.query_points(
+            collection_name=COLLECTION_NAME,
+            prefetch=[
+                models.Prefetch(
+                    query=models.SparseVector(indices=sparse_embeddings[0].indices, values=sparse_embeddings[0].values),
+                    using="sparse-text",
+                    limit=20,
+                    score_threshold=0.7,
+                ),
+                models.Prefetch(
+                    query=embeddings, 
+                    using="dense-text",
+                    limit=20,
+                    score_threshold=0.6,
+                ),
+            ],
+            query_filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="video_id",
+                        match=models.MatchValue(value=video_id)
+                    )
+                ]
+            ),
+            score_threshold=0.6,
+            query=models.FusionQuery(fusion=models.Fusion.RRF),
+            limit=10
+        )
+
+        print(res)
+
+        return JSONResponse(content={"message":"Queried Successfully"},status_code=200)
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500,detail="Internal Server Error")
