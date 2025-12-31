@@ -169,21 +169,19 @@ def login(email:str,password:str,db:Session):
         )
 
         response.set_cookie(
-            key="access_token",
-            value=access_token,
-            httponly=True,
-            secure=True,
-            samesite='lax',
-            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+                key='access_token',
+                httponly=True,
+                secure=True,
+                samesite='none',
+                value=access_token
         )
         response.set_cookie(
-            key="refresh_token",
-            value=refresh_token,
-            httponly=True,
-            secure=True,
-            samesite='lax',
-            max_age=settings.REFRESH_TOKEN_EXPIRE_MINUTES * 60
-        )
+                key='refresh_token',
+                httponly=True,
+                secure=True,
+                samesite='none',
+                value=refresh_token
+            )
 
         return response
 
@@ -206,8 +204,8 @@ def logout(user_id: str, db: Session):
             status_code=200
         )
 
-        response.delete_cookie(key="access_token", httponly=True, secure=True, samesite='lax')
-        response.delete_cookie(key="refresh_token", httponly=True, secure=True, samesite='lax')
+        response.delete_cookie(key="access_token", httponly=True, secure=True, samesite='none')
+        response.delete_cookie(key="refresh_token", httponly=True, secure=True, samesite='none')
 
         return response
 
