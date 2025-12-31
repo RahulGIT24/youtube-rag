@@ -2,17 +2,21 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../lib/api";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await api.post("/auth/login", { email, password });
+
       toast.success("Welcome back!");
+      await checkAuth()
       navigate("/");
     } catch (err: any) {
       toast.error(err.response?.data?.detail || "Login failed");
@@ -69,11 +73,11 @@ export default function Login() {
                 >
                   Password
                 </label>
-                <div className="text-sm">
+                {/* <div className="text-sm">
                   <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
                     Forgot your password?
                   </a>
-                </div>
+                </div> */}
               </div>
               <div className="mt-1">
                 <input

@@ -4,6 +4,7 @@ import { PlayCircle, Clock, Loader2, LogOutIcon } from "lucide-react";
 import api from "../lib/api";
 import toast from "react-hot-toast";
 import AddVideoModal from "../components/AddVideoModal";
+import { useAuth } from "../context/AuthContext";
 
 interface VideoSession {
   session_id: number;
@@ -20,6 +21,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const fetchSessions = async () => {
     try {
@@ -35,6 +37,7 @@ export default function Home() {
   const logout = async () => {
     try {
       await api.get("/auth/logout");
+      await checkAuth()
       toast.success("Logged Out");
       navigate("/login");
     } catch (error) {
