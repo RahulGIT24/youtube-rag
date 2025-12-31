@@ -163,3 +163,58 @@ def generate_response(session_id:int,query:str,db:Session,user_id:int):
         raise
     except Exception as e:
         raise HTTPException(status_code=500,detail="Internal Server Error")
+
+def get_user_sessions(user_id:int,db:Session):
+    try:
+        results = db.query(
+            UserToVideos.id.label("session_id"),
+            UserToVideos.created_at,
+            Video.video_id,
+            Video.video_url,
+            Video.ready,
+            Video.processing,
+            Video.enqueued,
+        ).join(
+            Video, UserToVideos.video_id == Video.video_id
+        ).filter(
+            UserToVideos.user_id == user_id
+        ).all()
+
+        if not results:
+            return []
+
+        return [dict(row._asdict()) for row in results]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500,detail="Internal Server Error")
+
+def get_user_session(user_id:int,db:Session,session_id:int):
+    try:
+        result = db.query(
+            UserToVideos.id.label("session_id"),
+            UserToVideos.created_at,
+            Video.video_id,
+            Video.video_url,
+            Video.ready,
+            Video.processing,
+            Video.enqueued,
+        ).join(
+            Video, UserToVideos.video_id == Video.video_id
+        ).filter(
+            UserToVideos.user_id == user_id, UserToVideos.id==session_id
+        ).first()
+
+        if not result:
+            raise HTTPException(detail="Session Not Found",status_code=404)
+
+        res_dict = result._asdict()
+
+        if res_dict['processing'] == False and res_dict['ready']==True:
+            return res_dict
+        raise HTTPException(detail="Video is not ready yet.",status_code=400)
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500,detail="Internal Server Error")

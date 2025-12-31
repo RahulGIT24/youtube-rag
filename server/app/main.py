@@ -48,4 +48,4 @@ async def signup(user=Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(detail="Internal Server Error",status_code=500)
 
-app.include_router(api_router,prefix=settings.API_V1_PREFIX,dependencies=[Depends(RateLimiter(times=2,seconds=5))])
+app.include_router(api_router,prefix=settings.API_V1_PREFIX,dependencies=[Depends(RateLimiter(times=10,seconds=5))])

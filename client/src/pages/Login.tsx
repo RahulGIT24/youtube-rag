@@ -20,7 +20,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen flex-col justify-center bg-linear-to-br from-blue-50 to-indigo-100 py-12 sm:px-6 lg:px-8">
       
       {/* Header Section */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
