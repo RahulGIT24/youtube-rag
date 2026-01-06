@@ -15,9 +15,7 @@ A powerful Retrieval-Augmented Generation (RAG) application that allows users to
 
 See the AI in action. The assistant retrieves context from a Python tutorial to answer specific coding questions.
 
-<video src="https://drive.google.com/file/d/1bNmoUpAr-LJelXbJPnyPvIJC6W0hEd5U/view" controls="controls" style="max-width: 100%;">
-</video>
-
+[![Watch the demo](assets/3.png)](https://drive.google.com/file/d/1bNmoUpAr-LJelXbJPnyPvIJC6W0hEd5U/view)
 ---
 
 ## 🛠️ User Workflow
