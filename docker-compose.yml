@@ -1,0 +1,125 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: pg
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: smarttube
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    container_name: cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - backend
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: yt-rag-api
+    command: uv run run.py
+    env_file:
+      - ./server/.env
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      QDRANT_COLLECTION: smarttube
+      DATABASE_URL: postgresql+psycopg://postgres:root@postgres:5432/smarttube
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+      - postgres
+      - qdrant
+    networks:
+      - backend
+  email_worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: email_worker
+    command: python -u email_worker.py
+    env_file:
+      - ./server/.env
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgresql+psycopg://postgres:root@postgres:5432/smarttube
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - backend
+  
+  transcribe_worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: transcribe_worker
+    command: python -u transcribe_worker.py
+    env_file:
+      - ./server/.env
+    environment:
+      REDIS_HOST: redis
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      QDRANT_COLLECTION: smarttube
+      REDIS_PORT: 6379
+      DATABASE_URL: postgresql+psycopg://postgres:root@postgres:5432/smarttube
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - backend
+  
+  celery-worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    command: celery -A celery_tasks worker --beat --loglevel=info
+    env_file:
+      - server/.env
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgresql+psycopg://postgres:root@postgres:5432/smarttube
+    depends_on:
+      - redis
+      - qdrant
+      - postgres
+    networks:
+      - backend
+
+networks:
+  backend:
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:

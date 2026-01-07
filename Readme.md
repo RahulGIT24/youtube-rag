@@ -4,39 +4,43 @@ A powerful Retrieval-Augmented Generation (RAG) application that allows users to
 
 ## 🚀 Key Features
 
-* **Video Ingestion**: Seamlessly processes YouTube videos via URL.
-* **Smart Queuing System**: Handles background processing (transcription & embedding) asynchronously.
-* **Interactive Chat**: RAG-powered Q&A interface that understands video context.
-* **Timestamp Linking**: Answers often include direct links to the relevant part of the video.
-* **Dashboard Management**: Track analyzed videos and history.
+- **Video Ingestion**: Seamlessly processes YouTube videos via URL.
+- **Smart Queuing System**: Handles background processing (transcription & embedding) asynchronously.
+- **Interactive Chat**: RAG-powered Q&A interface that understands video context.
+- **Timestamp Linking**: Answers often include direct links to the relevant part of the video.
+- **Dashboard Management**: Track analyzed videos and history.
+
 ---
 
 ## 📺 Project Demo
 
 See the AI in action. The assistant retrieves context from a Python tutorial to answer specific coding questions.
 
-[![Watch the demo](assets/3.png)](https://drive.google.com/file/d/1bNmoUpAr-LJelXbJPnyPvIJC6W0hEd5U/view)
----
+## [![Watch the demo](assets/3.png)](https://drive.google.com/file/d/1bNmoUpAr-LJelXbJPnyPvIJC6W0hEd5U/view)
 
 ## 🛠️ User Workflow
 
 ### 1. The Dashboard
+
 View all previously analyzed videos and start a new session.
 ![Dashboard View](assets/2.png)
 
 ### 2. Adding a Video
+
 Simply paste the YouTube URL into the input modal to begin analysis.
 ![Input Modal](assets/3.png)
 
 ### 3. Processing Pipeline
+
 The system utilizes a worker queue to handle heavy lifting (transcription and vector embedding) without freezing the UI.
 
-* **Step A: Queued** - Waiting for worker assignment.
-    ![Queue Status](assets/4.png)
-* **Step B: Processing** - Generating transcripts and embeddings.
-    ![Processing Status](assets/5.png)
+- **Step A: Queued** - Waiting for worker assignment.
+  ![Queue Status](assets/4.png)
+- **Step B: Processing** - Generating transcripts and embeddings.
+  ![Processing Status](assets/5.png)
 
 ### 4. Ready to Chat
+
 Once processed, the video appears in the dashboard, ready for interaction.
 ![Ready Dashboard](assets/6.png)
 
@@ -44,22 +48,24 @@ Once processed, the video appears in the dashboard, ready for interaction.
 
 ## 🏗️ Architecture (Conceptual)
 
-* **Frontend**: React + Typescript and tailwind for a responsive UI.
-* **Backend**: Python (FastAPI)
-* **AI/ML**: 
-    * LLM for reasoning (llama-3.3-70b-versatile).
-    * Vector Database for storing dense and sparse embeddings (Qdrant).
-* **Task Queue**: Redis and Celery for handling video processing jobs.
+- **Frontend**: React + Typescript and tailwind for a responsive UI.
+- **Backend**: Python (FastAPI)
+- **AI/ML**:
+  - LLM for reasoning (llama-3.3-70b-versatile).
+  - Vector Database for storing dense and sparse embeddings (Qdrant).
+- **Task Queue**: Redis and Celery for handling video processing jobs.
 
 ## 📦 Installation
 
 1.  **Clone the repository**
+
     ```bash
     git clone [https://github.com/RahulGIT24/youtube-rag]
     cd youtube-rag
     ```
 
 2.  **Install Dependencies**
+
     ```bash
     # For Server:-
     cd server
@@ -75,7 +81,15 @@ Once processed, the video appears in the dashboard, ready for interaction.
     For Server and Client :-
     Create a `.env` file and add your keys, take reference from `.env.sample`
 
-4.  **Run the App**
+4.  **Run Migrations**
+
+    ```bash
+    cd server
+    alembic upgrade head
+    ```
+
+5.  **Run the App**
+
     ```bash
     # Command to start backend
     cd server
@@ -86,7 +100,8 @@ Once processed, the video appears in the dashboard, ready for interaction.
     pnpm run dev
     ```
 
-4.  **Run the workers**
+6.  **Run the workers**
+
     ```bash
     cd server
 
