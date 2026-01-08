@@ -40,7 +40,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
-    container_name: yt-rag-api
+    image: smarttube-server
     command: uv run run.py
     env_file:
       - ./server/.env
@@ -60,10 +60,7 @@ services:
     networks:
       - backend
   email_worker:
-    build:
-      context: ./server
-      dockerfile: Dockerfile.dev
-    container_name: email_worker
+    image: smarttube-server
     command: python -u email_worker.py
     env_file:
       - ./server/.env
@@ -78,10 +75,7 @@ services:
       - backend
   
   transcribe_worker:
-    build:
-      context: ./server
-      dockerfile: Dockerfile.dev
-    container_name: transcribe_worker
+    image: smarttube-server
     command: python -u transcribe_worker.py
     env_file:
       - ./server/.env
@@ -99,9 +93,7 @@ services:
       - backend
   
   celery-worker:
-    build:
-      context: ./server
-      dockerfile: Dockerfile.dev
+    image: smarttube-server
     command: celery -A celery_tasks worker --beat --loglevel=info
     env_file:
       - server/.env

@@ -125,7 +125,8 @@ Once processed, the video appears in the dashboard, ready for interaction.
 3.  **Build and Run with Docker Compose**
 
     ```bash
-    docker-compose up --build
+    docker compose build ## build the containers
+    docker-compose up ## start the containers
     ```
 
 ## 🤝 Contributing
