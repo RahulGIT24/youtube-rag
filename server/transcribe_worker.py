@@ -20,13 +20,14 @@ load_dotenv()
 
 obj = Transcript()
 qdrant_client=get_client()
-db:Session=get_session()
 
 QUEUE_NAME="queue:pending"
 COLLECTION_NAME=os.getenv('QDRANT_COLLECTION')
 
+MAX_RETRIES=5
+video=None
 def process_job(job: dict):
-    db:Session = list(get_session())[0]
+    db:Session = next(get_session())
     try:
         video_id = job["video_id"]
 
@@ -34,10 +35,11 @@ def process_job(job: dict):
             db.query(Video)
             .filter(
                 Video.video_id == video_id,
-                Video.processing == False,
-                Video.ready == False
+                Video.ready == False,
+                Video.error_msg == None,
+                Video.retries < MAX_RETRIES
             )
-            .with_for_update()
+            .with_for_update(skip_locked=True)
             .first()
         )
 
@@ -85,13 +87,18 @@ def process_job(job: dict):
 
         video.processing = False
         video.ready = True
+        video.enqueued = False
         db.commit()
 
         logging.info(f"Finished video {video_id}")
 
-    except Exception:
+    except Exception as e:
         db.rollback()
-        logging.exception("Error processing video")
+        video.processing = False
+        video.ready = False
+        video.enqueued = True
+        db.commit()
+        logging.exception("Error processing video",e)
 
     finally:
         db.close()
@@ -108,7 +115,7 @@ def start_worker():
             process_job(job)
 
         except Exception as e:
-            logging.exception('Error while processing jobs. '+e)
+            logging.exception('Error while processing jobs.',e)
 
 if __name__ == "__main__":
     start_worker()

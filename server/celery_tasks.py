@@ -29,7 +29,7 @@ redis_client = Redis(
 )
 
 celery_app = Celery("tasks", broker=f"redis://{REDIS_HOST}:{REDIS_PORT}/0")
-STUCK_AFTER = timedelta(minutes=20)
+STUCK_AFTER = timedelta(seconds=10)
 
 @celery_app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
@@ -64,7 +64,7 @@ def requeue_stuck_videos():
                 continue
             if video.retries >= MAX_RETRIES:
                 video.enqueued = False
-                video.error_msg = f"Max retries ({MAX_RETRIES}) exceeded"
+                video.error_msg = f"Max retries ({MAX_RETRIES}) exceeded. Unable to embed video"
                 logging.info(f"Video {video.video_id} marked as failed")
                 continue
 
