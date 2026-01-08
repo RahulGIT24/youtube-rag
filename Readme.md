@@ -115,6 +115,19 @@ Once processed, the video appears in the dashboard, ready for interaction.
     uv run email_worker.py
     ```
 
+## 🐋 Docker Setup
+1. **Ensure Docker and Docker Compose are installed on your machine.**
+
+2. ** Setup Environment Variables**
+
+   Create a `.env` file in the server and client directory and add your configuration, referencing `.env.sample`.
+
+3.  **Build and Run with Docker Compose**
+
+    ```bash
+    docker-compose up --build
+    ```
+
 ## 🤝 Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

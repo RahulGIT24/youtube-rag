@@ -37,11 +37,12 @@ def setup_periodic_tasks(sender, **kwargs):
 
 # celery -A celery_tasks worker --beat --loglevel=info
 
+MAX_RETRIES = 5
 @celery_app.task
 def requeue_stuck_videos():
     logging.info("Starting requeue_stuck_videos task")
     try:
-        db = list(get_session())[0]
+        db = next(get_session())
         now = datetime.utcnow()
         cutoff = now - STUCK_AFTER
 
@@ -59,17 +60,26 @@ def requeue_stuck_videos():
         logging.info(f"Found {len(stuck_videos)} stuck videos to requeue")
 
         for video in stuck_videos:
-                try:
-                    with db.begin():
-                        video.enqueued_at = now
-                        video.retries += 1
-                    redis_client.lpush(QUEUE_NAME, json.dumps({
-                        "video_id": video.video_id,
-                        "video_url": video.video_url
-                    }))
-                    logging.info(f"Requeued video {video.video_id}")
-                except Exception as e:
-                    logging.exception(f"Failed to requeue video {video.video_id}: {e}")
+            if video.error_msg != None:
+                continue
+            if video.retries >= MAX_RETRIES:
+                video.enqueued = False
+                video.error_msg = f"Max retries ({MAX_RETRIES}) exceeded"
+                logging.info(f"Video {video.video_id} marked as failed")
+                continue
+
+            video.enqueued_at = now
+            video.retries += 1
+
+            redis_client.lpush(
+                QUEUE_NAME,
+                json.dumps({
+                    "video_id": video.video_id,
+                    "video_url": video.video_url
+                })
+            )
+
+            logging.info(f"Requeued video {video.video_id}")
 
     except Exception as e:
         logging.exception(f"Error in requeue_stuck_videos task: {e}")

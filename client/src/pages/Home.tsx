@@ -14,6 +14,7 @@ interface VideoSession {
   ready: boolean;
   processing: boolean;
   enqueued: boolean;
+  error_msg?: string;
 }
 
 export default function Home() {
@@ -37,7 +38,7 @@ export default function Home() {
   const logout = async () => {
     try {
       await api.get("/auth/logout");
-      await checkAuth()
+      await checkAuth();
       toast.success("Logged Out");
       navigate("/login");
     } catch (error) {
@@ -50,7 +51,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const hasActiveWork = sessions.some((s) => !s.ready);
+    const hasActiveWork = sessions?.some((s) => !s.ready);
 
     if (hasActiveWork) {
       const interval = setInterval(() => {
@@ -60,13 +61,16 @@ export default function Home() {
     }
   }, [sessions]);
 
-  const readyVideos = sessions.filter((s) => s.ready);
+  const readyVideos = sessions?.filter((s) => s.ready && !s.error_msg) ?? [];
 
-  const processingVideos = sessions.filter((s) => s.processing && !s.ready);
-
-  const enqueuedVideos = sessions.filter(
-    (s) => s.enqueued && !s.processing && !s.ready
+  const processingVideos = sessions?.filter(
+    (s) => s.processing && !s.ready && !s.error_msg
   );
+
+  const enqueuedVideos = sessions?.filter(
+    (s) => s.enqueued && !s.processing && !s.ready && !s.error_msg
+  );
+  const failedVideos = sessions?.filter((s) => !!s.error_msg && !s.ready);
 
   if (loading) {
     return (
@@ -126,6 +130,27 @@ export default function Home() {
               {readyVideos.map((video) => (
                 <VideoCard key={video.session_id} video={video} />
               ))}
+            </div>
+          )}
+          {failedVideos.length > 0 && (
+            <div className="mb-10">
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="text-red-600 h-5 w-5" />
+                <h2 className="text-lg font-bold text-gray-800">Failed</h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {failedVideos.map((video) => (
+                  <StatusItem
+                    key={video.session_id}
+                    videoId={video.video_id}
+                    statusText={video.error_msg ?? "Processing failed"}
+                    borderColor="border-red-200"
+                    textColor="text-red-600"
+                    bgColor="bg-red-50"
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -233,9 +258,7 @@ function StatusItem({
         <p className="text-sm font-bold text-gray-900 truncate mb-1">
           ID: {videoId}
         </p>
-        <p
-          className={`text-xs ${textColor} font-medium flex items-center gap-1`}
-        >
+        <p className={`text-xs ${textColor} font-medium break-words`}>
           {statusText}
         </p>
       </div>

@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column,relationship
 from sqlalchemy import String,Boolean,Integer
 from core.database import Base
+from typing import Optional
 from datetime import datetime
 from typing import List,TYPE_CHECKING
 
@@ -17,6 +18,7 @@ class Video(Base):
     retries:Mapped[int] = mapped_column(Integer,default=0)    
     enqueued:Mapped[bool]=mapped_column(Boolean,default=False)
     enqueued_at: Mapped[datetime] = mapped_column(default=None)
+    error_msg: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     saved_by_users: Mapped[List["UserToVideos"]] = relationship(
