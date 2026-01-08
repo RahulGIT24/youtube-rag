@@ -29,7 +29,7 @@ redis_client = Redis(
 )
 
 celery_app = Celery("tasks", broker=f"redis://{REDIS_HOST}:{REDIS_PORT}/0")
-STUCK_AFTER = timedelta(seconds=10)
+STUCK_AFTER = timedelta(minutes=20)
 
 @celery_app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
